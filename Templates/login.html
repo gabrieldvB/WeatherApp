@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+
+  <h2 class="title">Login</h2>
+
+  {% if error %}
+      <p class="error">{{ error }}</p>
+  {% endif %}
+  {% if success %}
+      <p class="success">{{ success }}</p>
+  {% endif %}
+
+  <form method="POST">
+    
+    <input 
+      type="email" 
+      name="email" 
+      placeholder="E-mail"
+      class="input"
+      required
+    >
+
+    <input 
+      type="password" 
+      name="password" 
+      placeholder="Senha"
+      class="input"
+      required
+    >
+
+    <button type="submit">Entrar</button>
+  </form>
+
+  <p class="small-link">
+    Não tem conta?
+    <a href="{{ url_for('register') }}">Cadastre-se</a>
+  </p>
+
+</div>
+{% endblock %}

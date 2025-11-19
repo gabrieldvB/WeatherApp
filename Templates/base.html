@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ title or "Weather App" }}</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --primary: #7b67ff;
+    --primary-dark: #604bff;
+    --primary-light: #9d8aff;
+
+    --bg-1: #0d0f18;
+    --bg-2: #161926;
+
+    --card: rgba(255, 255, 255, 0.07);
+    --card-border: rgba(255, 255, 255, 0.18);
+
+    --error: #ff4e70;
+    --success: #4effb0;
+
+    --radius: 16px;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Inter", sans-serif;
+  }
+
+  body {
+    height: 100vh;
+    background: radial-gradient(circle at 20% 20%, #1b1e32, #0d0f18 60%);
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* AURAS DE LUZ */
+  .glow {
+    position: absolute;
+    width: 550px;
+    height: 550px;
+    filter: blur(220px);
+    border-radius: 50%;
+    z-index: -1;
+    opacity: 0.55;
+    animation: breathing 8s ease-in-out infinite;
+  }
+
+  .glow.one { background: #7b67ff; top: -120px; left: -150px; }
+  .glow.two { background: #00f6ff; bottom: -120px; right: -150px; }
+
+  @keyframes breathing {
+    0%   { transform: scale(0.85); opacity: 0.4; }
+    50%  { transform: scale(1.1); opacity: 0.62; }
+    100% { transform: scale(0.9); opacity: 0.45; }
+  }
+
+  /* CARD GENÉRICO */
+  .card {
+    width: 420px;
+    padding: 2.5rem;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    backdrop-filter: blur(18px);
+    box-shadow: 0 15px 60px rgba(0, 0, 0, 0.45);
+
+    animation: fadeIn 0.7s ease forwards;
+    transform: translateY(25px);
+    opacity: 0;
+  }
+
+  @keyframes fadeIn {
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  /* ELEMENTOS SIMPLES */
+  .title {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-light);
+  }
+
+  .input {
+    width: 100%;
+    padding: 12px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: var(--radius);
+    color: white;
+    margin-top: .6rem;
+    margin-bottom: 1rem;
+  }
+
+  .input:focus {
+    border-color: var(--primary);
+    outline: none;
+  }
+
+  button {
+    width: 100%;
+    padding: 12px;
+    background: var(--primary);
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    color: white;
+    font-weight: 600;
+    margin-top: 1rem;
+  }
+
+  .small-link {
+    text-align: center;
+    margin-top: 1rem;
+    font-size: .9rem;
+  }
+
+  .error { color: var(--error); text-align: center; margin-bottom: .5rem; }
+  .success { color: var(--success); text-align: center; margin-bottom: .5rem; }
+
+</style>
+</head>
+
+<body>
+
+  <div class="glow one"></div>
+  <div class="glow two"></div>
+
+  {% block content %}{% endblock %}
+
+</body>
+</html>
