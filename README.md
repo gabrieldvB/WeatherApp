@@ -368,20 +368,14 @@ Atualiza idioma (pt/en).
 
 ## 📝 Licença
 
-Este projeto é de código aberto e está disponível sob a licença MIT.
+Este projeto é 100% open source.
 
-## 👨‍💻 Autor
+## 👨‍💻 Autores
+https://github.com/gabrieldvB && https://github.com/GalakCV
 
 **Desenvolvido com ❤️ usando Flask, SQLite e Open-Meteo API**
 
 ---
 
-## 📞 Suporte
-
-Para dúvidas ou problemas:
-- 🐛 Abra uma [issue](https://github.com/username/weather-app/issues)
-- 📧 Entre em contato via email
-
----
 
 ⭐ Se este projeto foi útil, considere dar uma estrela no GitHub!
