@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card" style="width: 800px; max-width: 95vw; max-height: 90vh; overflow-y: auto;">
+
+  <div class="dashboard-header">
+    <h2 class="title" style="margin: 0;">☁️ Weather App</h2>
+    <div style="display: flex; gap: 10px;">
+      <div class="theme-toggle">
+        <label class="switch">
+          <input type="checkbox" id="themeToggle" {% if theme == 'light' %}checked{% endif %}>
+          <span class="slider"></span>
+        </label>
+      </div>
+      <a href="{{ url_for('logout') }}" class="btn-secondary">Sair</a>
+    </div>
+  </div>
+
+  <form method="POST">
+    <input 
+      type="text" 
+      name="city" 
+      placeholder="Digite o nome da cidade"
+      class="input"
+      value="{{ city or '' }}"
+      required
+    >
+    <button type="submit">🔍 Buscar</button>
+  </form>
+
+  <!-- Favoritos -->
+  {% if favorites %}
+  <div style="margin-top: 20px;">
+    <h3 style="font-size: 1.1rem; margin-bottom: 10px;">⭐ Cidades Favoritas</h3>
+    <div class="favorites-grid">
+      {% for fav in favorites %}
+      <form method="POST" class="favorite-item">
+        <input type="hidden" name="city" value="{{ fav.city_name }}">
+        <span onclick="this.closest('form').submit()" style="cursor: pointer;">{{ fav.city_name }}</span>
+        <button type="button" onclick="toggleFavorite('{{ fav.city_name }}', {{ fav.latitude }}, {{ fav.longitude }})">🗑️</button>
+      </form>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Histórico -->
+  {% if history %}
+  <div style="margin-top: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <h3 style="font-size: 1.1rem; margin-bottom: 10px;">📜 Histórico de Buscas</h3>
+      <button type="button" onclick="clearHistory()" class="btn-secondary" style="font-size: 0.8rem; padding: 5px 10px;">Limpar</button>
+    </div>
+    <div class="history-list">
+      {% for item in history[:5] %}
+      <form method="POST" class="history-item">
+        <input type="hidden" name="city" value="{{ item.city_name }}">
+        <span onclick="this.closest('form').submit()" style="cursor: pointer;">{{ item.city_name }}</span>
+      </form>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if weather %}
+    {% if weather.error %}
+      <p class="error">{{ weather.error }}</p>
+    {% else %}
+    <div style="margin-top: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <h3 class="title" style="font-size: 1.8rem; margin: 0;">
+          {{ weather.weather_icon }} {{ weather.city }}
+        </h3>
+        <button 
+          type="button" 
+          id="favoriteBtn"
+          class="btn-favorite {% if weather.is_favorite %}is-favorite{% endif %}"
+          onclick="toggleFavorite('{{ weather.city }}', {{ weather.latitude }}, {{ weather.longitude }})"
+          style="padding: 8px 16px; font-size: 0.9rem; margin: 0;">
+          {% if weather.is_favorite %}⭐ Remover{% else %}☆ Adicionar{% endif %}
+        </button>
+      </div>
+
+      <div style="margin-top: 1.5rem; text-align: left; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.5rem;">🌡️</span>
+          <p><strong>Temperatura:</strong> {{ weather.temperature }}°C</p>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.5rem;">💨</span>
+          <p><strong>Vento:</strong> {{ weather.windspeed }} km/h</p>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.5rem;">💧</span>
+          <p><strong>Umidade:</strong> {{ weather.humidity }}%</p>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.5rem;">🌅</span>
+          <p><strong>Nascer do Sol:</strong> {{ weather.sunrise }}</p>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.5rem;">🌇</span>
+          <p><strong>Pôr do Sol:</strong> {{ weather.sunset }}</p>
+        </div>
+      </div>
+
+      <!-- Gráfico de Temperatura -->
+      {% if weather.hourly_temps %}
+      <div style="margin-top: 2rem;">
+        <h3 style="font-size: 1.2rem; margin-bottom: 15px;">📊 Temperatura nas Próximas 24h</h3>
+        <div class="chart-container">
+          <canvas id="temperatureChart"></canvas>
+        </div>
+      </div>
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          const labels = {{ weather.hourly_times|tojson }};
+          const temps = {{ weather.hourly_temps|tojson }};
+          createTemperatureChart(labels, temps);
+        });
+      </script>
+      {% endif %}
+
+      <!-- Previsão para 7 dias -->
+      {% if forecast %}
+      <div style="margin-top: 2rem;">
+        <h3 style="font-size: 1.2rem; margin-bottom: 15px;">📅 Previsão para os Próximos 7 Dias</h3>
+        <div class="forecast-grid">
+          {% for day in forecast %}
+          <div class="forecast-day">
+            <div class="date">{{ day.date }}</div>
+            <div class="icon">{{ day.icon }}</div>
+            <div class="temp">{{ day.max_temp|round }}°</div>
+            <div style="font-size: 0.9rem; color: #888;">Min: {{ day.min_temp|round }}°</div>
+            {% if day.precipitation > 0 %}
+            <div style="font-size: 0.85rem; margin-top: 5px;">💧 {{ day.precipitation }}%</div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+    {% endif %}
+  {% endif %}
+
+</div>
+
+<script>
+// Variável global para cidade atual
+let currentCity = {{ weather.city|tojson if weather and not weather.error else 'null' }};
+let currentLat = {{ weather.latitude if weather and not weather.error else 'null' }};
+let currentLon = {{ weather.longitude if weather and not weather.error else 'null' }};
+</script>
+
+{% endblock %}

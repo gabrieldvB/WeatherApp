@@ -18,6 +18,7 @@
       name="email" 
       placeholder="E-mail"
       class="input"
+      value="{{ last_user or '' }}"
       required
     >
 
@@ -28,6 +29,14 @@
       class="input"
       required
     >
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+      <label style="display: flex; align-items: center; gap: 5px; font-size: 0.9rem;">
+        <input type="checkbox" name="remember" style="width: auto;">
+        Lembrar-me
+      </label>
+      <a href="{{ url_for('forgot_password') }}" style="font-size: 0.9rem; color: var(--primary-light); text-decoration: none;">Esqueceu a senha?</a>
+    </div>
 
     <button type="submit">Entrar</button>
   </form>
